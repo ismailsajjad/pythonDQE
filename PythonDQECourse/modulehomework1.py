@@ -23,3 +23,49 @@
 
 #-------------------------Calculate average for even and odd numbers
 
+# Sample list of even_numbers and odd_number
+# even_numbers = [2,4,6,8,10,12,14]
+# odd_number = [1,3,5,7,9,11,13]
+
+# Calculate the average for even numbers
+# if even_numbers:
+#     avg_even = sum(even_numbers) / len(even_numbers)
+# else:
+#     avg_even = 0  # Handle the case when there are no even numbers
+#
+# # Calculate the average for odd numbers
+# if odd_number:
+#     avg_odd = sum(odd_number) / len(odd_number)
+# else:
+#     avg_odd = 0  # Handle the case when there are no odd numbers
+#
+# print(f"Average of even numbers: {avg_even}")
+# print(f"Average of odd numbers: {avg_odd}")
+
+#-------------------------Calculate average for even and odd numbers
+
+# Sample list of even_numbers and odd_number
+list_numbers = [2,4,6,8,10,12,14,1,3,5,7,9,11,13]
+even_num= []   #empty strings even_number
+odd_num=[]     #empty string odd number
+# Calculate the average for even numbers
+for i in list_numbers:
+    if i%2 == 0:
+        even_num.append(i)   #append function is used to add value of list in empty string
+    else:
+        odd_num.append(i)
+
+# Calculate the average for even numbers
+if even_num:
+    avg_even = sum(even_num) / len(even_num)   # Sum function will add the value of even_num and length will check the length of list
+else:
+    avg_even = 0  # Handle the case when there are no even numbers
+
+# Calculate the average for odd numbers
+if odd_num:
+    avg_odd = sum(odd_num) / len(odd_num)
+else:
+    avg_odd = 0  # Handle the case when there are no odd numbers
+
+print(f"Average of even numbers: {avg_even}")
+print(f"Average of odd numbers: {avg_odd}")
