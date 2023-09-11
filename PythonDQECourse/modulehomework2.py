@@ -31,27 +31,27 @@
 # print(list_2)
 # combined_list = [list_1,list_2]
 
-list_1 = {'d': 5, 'k': 5, 'u': 2, 'r': 5, 's': 8}
+list_1 = {'d': 5, 'k': 5, 'u': 2, 'r': 5, 's': 8}  #created dictionary
 print(list_1)
 list_2 = {'l': 1, 'd': 8, 'i': 6,'u': 5}
 print(list_2)
 # Create a merged dictionary
-merged_dict = {}
+merged_dictionary = {}
 # Merge dict1 into merged_dict
 for key, value in list_1.items():
-    if key in merged_dict:
-        merged_dict[key] = merged_dict[key], value
+    if key in merged_dictionary:
+        merged_dictionary[key] = merged_dictionary[key], value
     else:
-        merged_dict[key] = value
-print(merged_dict)
+        merged_dictionary[key] = value
+print(merged_dictionary)
 # Merge dict2 into merged_dict
 for key, value in list_2.items():
-    if key in merged_dict:
-        merged_dict[f'{key}_{1}'] = max(merged_dict[key], value)
+    if key in merged_dictionary:
+        merged_dictionary[f'{key}_{1}'] = max(merged_dictionary[key], value) #adding -1 to max value in merged_dictionary
     else:
-        merged_dict[key] = value
+        merged_dictionary[key] = value
 
 # Print the merged dictionary
-print(merged_dict)
+print(merged_dictionary)
 
 
