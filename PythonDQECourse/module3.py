@@ -50,4 +50,15 @@ print(gf)   #abc
 import os
 print(os.path.join("C:","User","IsmailSajjad"))
 
+# #cancatination
+ef = 'Monday'
+fe = 'Friday'
+print(f"I will be off on {ef} and {fe}")
+
+# #regexp string searching algorithm
+import re
+pp = 'It is Monday and it is good day'
+result = re.search(r'M.*?day',pp)
+print(result.group())
+
 
