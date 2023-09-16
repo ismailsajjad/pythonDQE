@@ -34,7 +34,7 @@
 # print(ae.count('gg'))
 # #sort()
 # #we can use sort in list and array not in tuple
-list_a = [1,2,3,5,8,9,4]
+# list_a = [1,2,3,5,8,9,4]
 # print(list_a.sort()) # it will return NULL
 # print(list_a)    # it will return  [1, 2, 3, 4, 5, 8, 9]
 # print(sorted(list_a)) # it will return  [1, 2, 3, 4, 5, 8, 9]
@@ -43,9 +43,61 @@ list_a = [1,2,3,5,8,9,4]
 
 # #insert()  It allow us to add element in any position in list
 
-list_a.insert(7,7)
-print(list_a)
+# pop_list = [2,3,5,8,9,10]
+# b = pop_list.pop(2)
+# print(b)
 
 # #pop it allow us to remove some elements
-b = list_a.pop(2)
-print(b)
+# The pop() function removes the last element or the element based on the index given. remove() function removes the first
+# occurrence of the specified element.
+#remove not working on tuple
+
+# pop_list.remove(3)
+# print(pop_list)
+
+# #reverse it reverse the emlements from list not working on tuple
+# reverse_list = [4,9,8,6,2,5,5]
+# reverse_list.reverse()
+# print(reverse_list)
+
+#copy method
+# #it will copy the list
+# a_copy = [5,8,3,9,2]
+# b_copy = a_copy.copy()
+# a_copy.sort()
+# print("a_copy" , a_copy)
+# print("b_copy", b_copy)
+
+# #Dictionary
+# dic_a = {'a': 1,'d' : 43,(1,3,5) :88,True :99 }
+# print(dic_a)
+# print(type(dic_a))
+# print(dic_a.get(True))
+#
+# # #update
+# dic_a[(1,3,5)] = 99
+# print(dic_a)
+
+# #fromkeys
+# b = dic_a.fromkeys([1,3,5],88)
+# print(b)
+
+# #keys(), values(), items()
+# for key, value in dic_a.items():
+#     print('this is key', key,  ' ; This is value', value)
+
+
+# #creating dic
+
+a_dic = {'name' : 'ismail', 'country':'PAK', 'year': '2023'}
+print(a_dic)
+print(a_dic['name'])
+a_dic.setdefault('month','N/A')
+print(a_dic['month'])
+
+# #set
+set_a = {1,3,5,8,8}
+print(set_a)
+set_a.add(9)
+print(set_a)
+
