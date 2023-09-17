@@ -71,3 +71,48 @@ print(merged_list)
 
 # #---------------------------
 
+a= "homEwork: this iz your homework, copy these Text to variable. You NEED TO normalize it fROM letter CASES point of View. also, create one MORE senTENCE with LAST WORDS of each existING SENtence and add it to the END OF this Paragraph. it iz misspelling here. fix❝iZ\" with correct \"is\", but ONLY when it Iz a mistAKE. last iz TO calculate number Of Whitespace characteRS in this Text. caREFULL, not only Spaces, but ALL whitespaces. I got 87."
+
+# print(a)
+def sentence_lower(a):
+    normalize_a = a.lower()
+    return normalize_a
+
+# Normalize the text
+def spliting_sentence_into_text(a):
+    splitted_sentences = a.split(". ") # Spliting the text into sentences
+    # print(sentences)
+    return splitted_sentences
+
+# Create a new sentence using the last words of each existing sentence
+def normalize_sentence(sentences):
+    last_words = [sentence.split()[-1] for sentence in sentences]
+    new_sentence = " ".join(last_words) + "."
+    return new_sentence
+
+    # Add the new sentence to the end of the paragraph
+def add_new_sentence(normalize_a,new_sentence):
+    normalize_a += " " + new_sentence
+    print(normalize_a)
+    return normalize_a
+
+# Calculate the number of whitespace characters
+def calculate_whitespace(a):
+    whitespace_count = sum(1 for char in a if char.isspace())
+    print(a)
+    print(f"Number of whitespace characters: {whitespace_count}")
+    return whitespace_count
+
+lower_sentence = sentence_lower(a)
+splitted_sentences = spliting_sentence_into_text(lower_sentence)
+print(splitted_sentences)
+new_sentence = normalize_sentence(splitted_sentences)
+print(new_sentence)
+last_result = add_new_sentence(lower_sentence,new_sentence)
+print(last_result)
+whitespaces = calculate_whitespace(a)
+print(whitespaces)
+
+
+
+
