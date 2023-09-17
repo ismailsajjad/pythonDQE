@@ -64,5 +64,23 @@ scop()
 # print(x)
 
 #lambda
-a = lambda x: x + 1
-print(a(5))
+a = lambda x,y: x + y
+print(a(5,3))
+
+# Decorator wrap another function to extend its functionality without directly changing the code
+
+# def first_fuction():
+#     print("Hello")
+# first_fuction()
+
+def time_decorator(funct):
+    def wrap():
+        print("before")
+        funct()
+        print("after")
+    return wrap
+@time_decorator
+def func():
+    print("testing")
+func()
+
