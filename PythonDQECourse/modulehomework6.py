@@ -73,9 +73,7 @@ def run():
         elif choice == 'recordstextfile':
             file_name = input("Enter the name of the text file to load: ") or "ismail6.txt"
             folder_name = input("Enter the folder (test_new_module_6 if empty): ") or "default_folder"
-            remove_file = input("Remove the file after loading (yes/no): ").lower() == 'no'
-            case_normalize = input("Apply case normalization (yes/no): ").lower() == 'yes'
-            data_loader.load_records(file_name, folder_name,remove_file, case_normalize)
+            data_loader.load_records(file_name, folder_name)
         else:
             print("Invalid choice. Please select a valid option.")
 
@@ -85,7 +83,7 @@ class FeedDataLoader:
     def __init__(self):
         self.feed_data = []
 
-    def load_records(self, file_name ="ismail6.txt", folder_name="default_folder", remove_file=False, case_normalize=False):
+    def load_records(self, file_name ="ismail6.txt", folder_name="default_folder"):
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
             print(f"Folder '{folder_name}' created.")
