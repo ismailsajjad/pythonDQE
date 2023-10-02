@@ -73,7 +73,9 @@ def run():
         elif choice == 'recordstextfile':
             file_name = input("Enter the name of the text file to load: ") or "module6text.txt"
             folder_name = input("Enter the folder (test_new_module_6 if empty): ") or "default_folder"
-            data_loader.load_records(file_name, folder_name)
+            title = input("To days Latest News") or "default_title"
+            text = input("We have won the Match") or "default_text"
+            data_loader.load_records(file_name, folder_name, title, text)
         else:
             print("Invalid choice. Please select a valid option.")
 
@@ -83,19 +85,8 @@ class FeedDataLoader:
     def __init__(self):
         self.feed_data = []
 
-    def load_records(self, file_name ="module6text.txt", folder_name="default_folder"):
-        if not os.path.exists(folder_name):
-            os.makedirs(folder_name)
-            print(f"Folder '{folder_name}' created.")
-        else:
-            print(f"Folder '{folder_name}' already exists.")
-        file_path = os.path.join(folder_name, file_name)
-
-        if not os.path.exists(file_path):
-            with open(file_path, "w") as file:
-                print(f"File '{file_name}' created inside '{folder_name}'.")
-        else:
-                print(f"File '{file_name}' already exists inside '{folder_name}'.")
+    def load_records(self, file_name ="module6text.txt", folder_name="default_folder", title = "default_title", text = "default_text"):
+        self.feed_data.append({"type": "News", "text": title, "city": text})
         try:
             if not os.path.exists(folder_name):
                 os.makedirs(folder_name)
@@ -103,21 +94,35 @@ class FeedDataLoader:
             else:
                 print(f"Folder '{folder_name}' already exists.")
             file_path = os.path.join(folder_name, file_name)
-            with open(file_path, "a") as file:
-                    file.write("Record 1\n")
-                    file.write("Record 2\n")
-                    file.write("Record 3\n")
-                    file.write("Record 4\nRecord 5\nRecord 6\n")
-                    print(file)
-            with open(file_path, "r") as file:
-                    file_contents = file.read()
-                    case_normalize = file_contents.lower()
-                    print(case_normalize)
-            os.remove(file_path)
-            print(f"File '{file_path}' removed.")
+
+            if not os.path.exists(file_path):
+                with open(file_path, "w") as file:
+                    print(f"File '{file_name}' created inside '{folder_name}'.")
+            else:
+                print(f"File '{file_name}' already exists inside '{folder_name}'.")
+
+            file_path = os.path.join(folder_name, file_name)
+            self.load_records_function(file_path)
 
         except Exception as e:
             print(f"Error loading records from '{file_name}': {str(e)}")
+
+    def load_records_function(self,file_path):
+        with open(file_path, "a") as file:
+            if file_path:
+                file.write(",\n")  # Separate records with a comma and newline for an existing file
+                json.dump(self.feed_data, file, indent=4)
+                    # file.write(title"\n")
+                    # file.write("Record 2\n")
+                    # file.write("Record 3\n")
+                    # file.write("Record 4\nRecord 5\nRecord 6\n")
+                    # print(file)
+        with open(file_path, "r") as file:
+                file_contents = file.read()
+                case_normalize = file_contents.lower()
+                print(case_normalize)
+        os.remove(file_path)
+        print(f"File '{file_path}' removed.")
 
 if __name__ == "__main__":
     run()
