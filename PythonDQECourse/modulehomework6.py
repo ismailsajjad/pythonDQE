@@ -71,7 +71,7 @@ def run():
             expiration_date_str = input("Enter the expiration date (YYYY-MM-DD): ")  #here we can add expiration date
             news_feed_tool.adding_private_ad(text, expiration_date_str)
         elif choice == 'recordstextfile':
-            file_name = input("Enter the name of the text file to load: ") or "ismail6.txt"
+            file_name = input("Enter the name of the text file to load: ") or "module6text.txt"
             folder_name = input("Enter the folder (test_new_module_6 if empty): ") or "default_folder"
             data_loader.load_records(file_name, folder_name)
         else:
@@ -83,7 +83,7 @@ class FeedDataLoader:
     def __init__(self):
         self.feed_data = []
 
-    def load_records(self, file_name ="ismail6.txt", folder_name="default_folder"):
+    def load_records(self, file_name ="module6text.txt", folder_name="default_folder"):
         if not os.path.exists(folder_name):
             os.makedirs(folder_name)
             print(f"Folder '{folder_name}' created.")
@@ -93,7 +93,6 @@ class FeedDataLoader:
 
         if not os.path.exists(file_path):
             with open(file_path, "w") as file:
-    # Optionally, write data to the file here
                 print(f"File '{file_name}' created inside '{folder_name}'.")
         else:
                 print(f"File '{file_name}' already exists inside '{folder_name}'.")
