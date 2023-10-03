@@ -37,7 +37,7 @@ class NewsGenerator:
 
     def publish_feed(self):
 
-        file_name = 'test_new_module_6/Latest_News'  #it will be the file name
+        file_name = 'default_folder/Latest_News'  #it will be the file name
         file_exists = os.path.isfile(file_name)
 
         # Open the file in append mode if it exists, or create it if it doesn't
