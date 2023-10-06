@@ -20,12 +20,12 @@ class NewsGenerator:
     def __init__(self):
         self.feed_data = []
 
-    def adding_news(self, text = 'default_text', city = 'default_city'):              #this is news function where we can add news
+    def adding_news(self, text="default_text", city="default_city"):              #this is news function where we can add news
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #adding current date and time
         self.feed_data.append({"type": "News", "text": text, "city": city, "timestamp": timestamp})
         self.publish_feed()
 
-    def adding_private_ad(self, text, expiration_date_str):        #this is private add function where we can add add
+    def adding_private_ad(self, text="default_text", expiration_date_str="2023-12-31"):        #this is private add function where we can add add
         try:
             expiration_date = datetime.strptime(expiration_date_str, "%Y-%m-%d")
             days_left = (expiration_date - datetime.now()).days
@@ -50,7 +50,7 @@ class NewsGenerator:
             # Write the feed data
             if file_exists:
                 file.write(",\n")  # Separate records with a comma and newline for an existing file
-            json.dump(self.feed_data, file, indent=4)
+                json.dumps(file, indent=4)
 
             if not file_exists:
                 # If it's a new file, write a closing bracket to finish the JSON array
@@ -96,19 +96,19 @@ class NewsGenerator:
         print(f"Results written to '{csv_file_name}' as a CSV file with headers.")
         print("News Generator")
 
-
 def run():
         news_feed_tool = NewsGenerator()
         data_loader = FeedDataLoader()
-        choice = input("Enter the type of news record (News/privateAd/RecordsTextFile): ").lower()
+        publication_loader = JSONProcessor()
+        choice = input("Enter the type of news record (News/privateAd/RecordsTextFile/publication): ").lower()
         # choice = sys.argv[0]
         if choice == 'news':
             text = input("Enter the news text: ") or "default_text"  #getting input from user
             city = input("Enter the city: ") or "default_city"
             news_feed_tool.adding_news(text, city)
         elif choice == 'privatead':
-            text = input("Enter the ad text: ")
-            expiration_date_str = input("Enter the expiration date (YYYY-MM-DD): ")  #here we can add expiration date
+            text = input("Enter the ad text: ") or "default_text"
+            expiration_date_str = input("Enter the expiration date (YYYY-MM-DD): ") or "2023-12-31"  #here we can add expiration date
             news_feed_tool.adding_private_ad(text, expiration_date_str)
         elif choice == 'recordstextfile':
             file_name = input("Enter the name of the text file to load: ") or "module6text.txt"
@@ -116,9 +116,15 @@ def run():
             title = input("To days Latest News") or "default_title"
             text = input("We have won the Match") or "default_text"
             data_loader.load_records(file_name, folder_name, title, text)
+        elif choice == 'publication':
+            file_name = input("Enter the name of file (default_file if empty): ") or "module8json.json"
+            folder_name = input("Enter the name of folder (default_folder if empty): ") or "default_folder"
+            title = input("Enter the Publication title (default_title if empty):") or "default_title"
+            text = input("Enter the Publication text (default_text if empty):") or "default_text"
+            exp_date = input("Enter the Publication expiration date (YYYY-MM-DD) (2023-12-31 if empty):") or "2023-12-31"
+            publication_loader.load_json_records(file_name, folder_name, title, text,exp_date)
         else:
             print("Invalid choice. Please select a valid option.")
-
 
 
 class FeedDataLoader:
@@ -164,13 +170,45 @@ class FeedDataLoader:
         os.remove(file_path)
         print(f"File '{file_path}' removed.")
 
+class JSONProcessor:
+    def __init__(self):
+        self.feed_data = {}
+    def load_json_records(self,file_name = 'module8json.json', folder_name = 'default_folder', title = 'default_title', text = 'default_text',exp_date = '2023-12-31'):
+        self.feed_data = {"type": "Publication", "title": title, "text": text, "exp_date": exp_date}
+        self.publish_json_feed(file_name,folder_name)
+
+    def publish_json_feed(self,file_name,folder_name):
+        try:
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+                print(f"Folder '{folder_name}' created.")
+            else:
+                print(f"Folder '{folder_name}' already exists.")
+            file_path = os.path.join(folder_name, file_name)
+
+                # Check if the JSON file exists
+            if os.path.exists(file_path):
+        # If the file exists, load the existing JSON data
+                with open(file_path, "r") as json_file:
+                    records_dict = json.load(json_file)
+            else:
+         # If the file doesn't exist, initialize an empty dictionary
+                records_dict = {}
+
+        # Determine the next sequential key
+            next_key = str(len(records_dict) + 1)
+            # Add the sample record to the dictionary with the next sequential key
+            records_dict[next_key] = self.feed_data
+
+        # Save the updated JSON data to the JSON file
+            with open(file_path, "w") as json_file:
+                json.dump(records_dict, json_file, indent=4)
+
+            print(f"JSON data updated and saved to '{file_path}'")
+
+        except Exception as e:
+            print(f"Error loading records from '{file_name}': {str(e)}")
+
 if __name__ == "__main__":
     run()
-    # news_feed_tool = NewsGenerator()
-    # news_feed_tool.run()
-#additional class which allow to provide records by text file
-# 1. Define input formate (one or many records)
-# 2. default folder or user provided folder
-# 3. Remove file if its successfully created
-# 4. Apply case normalization function
 
