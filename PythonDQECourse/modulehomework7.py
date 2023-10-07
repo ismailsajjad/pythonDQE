@@ -13,13 +13,14 @@ import json
 import os
 from datetime import datetime, timedelta
 import sys
+import csv
 
 
 class NewsGenerator:
     def __init__(self):
         self.feed_data = []
 
-    def adding_news(self, text, city):              #this is news function where we can add news
+    def adding_news(self, text = 'default_text', city = 'default_city'):              #this is news function where we can add news
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #adding current date and time
         self.feed_data.append({"type": "News", "text": text, "city": city, "timestamp": timestamp})
         self.publish_feed()
@@ -37,7 +38,7 @@ class NewsGenerator:
 
     def publish_feed(self):
 
-        file_name = 'default_folder/Latest_News'  #it will be the file name
+        file_name = 'default_folder/News$PrviateAd.csv'  #it will be the file name
         file_exists = os.path.isfile(file_name)
 
         # Open the file in append mode if it exists, or create it if it doesn't
@@ -54,7 +55,46 @@ class NewsGenerator:
             if not file_exists:
                 # If it's a new file, write a closing bracket to finish the JSON array
                 file.write("]")
-            print("News Generator")
+        with open(file_name, "r") as file:
+            # Read the file contents
+                 file_contents = file.read()
+        # Convert the contents to lowercase
+        lowercase_contents = file_contents.lower()
+        print(lowercase_contents)
+        # Count letters (alphabetic characters)
+        letter_count = sum(1 for char in file_contents if char.isalpha())
+
+        # Count all words
+        words = file_contents.split()
+        total_characters = len(words)
+
+        # Count uppercase letters
+        uppercase_count = sum(1 for char in file_contents if char.isupper())
+
+        # percentage of uppercase letters
+        percentage_uppercase = (uppercase_count / letter_count) * 100 if letter_count > 0 else 0
+
+        # Create a list with the results and headers
+        results = [
+                    ["Total letters", letter_count],
+                    ["Total characters", total_characters],
+                    ["Total uppercase letters", uppercase_count],
+                    ["Percentage of uppercase letters", f"{percentage_uppercase:.2f}%"]
+                 ]
+
+        # Define the CSV file name
+        csv_file_name ='default_folder/results.csv'
+
+        # Write the results to a CSV file with headers
+        with open(csv_file_name, "w", newline="") as csv_file:
+            headers =['Total_letters','Total_characters','Total_uppercase_letters','Percentage_of_uppercase_letters']
+            test_write = csv.DictWriter(csv_file, fieldnames=headers,quotechar="'", delimiter =";",quoting=csv.QUOTE_ALL)
+            test_write.writeheader()
+            writer = csv.writer(csv_file)
+            writer.writerows(results)
+
+        print(f"Results written to '{csv_file_name}' as a CSV file with headers.")
+        print("News Generator")
 
 
 def run():
@@ -63,8 +103,8 @@ def run():
         choice = input("Enter the type of news record (News/privateAd/RecordsTextFile): ").lower()
         # choice = sys.argv[0]
         if choice == 'news':
-            text = input("Enter the news text: ")   #getting input from user
-            city = input("Enter the city: ")
+            text = input("Enter the news text: ") or "default_text"  #getting input from user
+            city = input("Enter the city: ") or "default_city"
             news_feed_tool.adding_news(text, city)
         elif choice == 'privatead':
             text = input("Enter the ad text: ")
