@@ -1,13 +1,8 @@
 # Home Work:
-# Create a tool which will do user generated news feeds:
-# 1. User select what data type he want to add
-# 2. Provide record type required data
-# 3. Records is published on text file in special format
-
-#Need to implement
-# 1. News - text and city input.Data is calculated during publishing
-# 2. Prictae ad - text and expiration date as input. Day left is calculated during publishing.
-# 3. Your unique one with unique publish rules.
+# Create a tool which will do user generated xml file:
+# 1. Define input formate
+# 2. Defulat folder or seletecd file
+# 3. Remove file when it's done
 
 import json
 import os
@@ -187,6 +182,10 @@ class xmlProcessor:
     # Save the updated XML to the file
         tree.write(file_name, xml_declaration=True, encoding="utf-8")
 
+    #remove the file
+        os.remove(file_name)
+
+
 def indent(elem, level=0):
         i = "\n" + level * "  "
         if len(elem):
@@ -233,11 +232,6 @@ class FeedDataLoader:
             if file_path:
                 file.write(",\n")  # Separate records with a comma and newline for an existing file
                 json.dump(self.feed_data, file, indent=4)
-                    # file.write(title"\n")
-                    # file.write("Record 2\n")
-                    # file.write("Record 3\n")
-                    # file.write("Record 4\nRecord 5\nRecord 6\n")
-                    # print(file)
         with open(file_path, "r") as file:
                 file_contents = file.read()
                 case_normalize = file_contents.lower()
