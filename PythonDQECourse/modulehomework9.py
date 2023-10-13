@@ -7,7 +7,7 @@
 import json
 import os
 from datetime import datetime, timedelta
-import sys
+import sqlite3
 import csv
 import xml.etree.ElementTree as ET
 
@@ -32,7 +32,6 @@ class NewsGenerator:
         self.feed_data.append({"type": "Private Ad", "text": text, "expiration_date": expiration_date_str, "days_left": days_left})
         self.publish_feed()   #calling the function
 
-
     def publish_feed(self):
 
         file_name = 'default_folder/News$PrviateAd.csv'  #it will be the file name
@@ -47,7 +46,7 @@ class NewsGenerator:
             # Write the feed data
             if file_exists:
                 file.write(",\n")  # Separate records with a comma and newline for an existing file
-                json.dumps(file, indent=4)
+            json.dump(self.feed_data, file, indent=4)
 
             if not file_exists:
                 # If it's a new file, write a closing bracket to finish the JSON array
@@ -89,7 +88,9 @@ class NewsGenerator:
             test_write.writeheader()
             writer = csv.writer(csv_file)
             writer.writerows(results)
-
+        os.remove(csv_file)
+        os.remove(file_name)
+        print(f"File '{csv_file}' removed.")
         print(f"Results written to '{csv_file_name}' as a CSV file with headers.")
         print("News Generator")
 
@@ -97,8 +98,7 @@ def run():
         news_feed_tool = NewsGenerator()
         data_loader = FeedDataLoader()
         publication_loader = JSONProcessor()
-        choice = input("Enter the type of news record (News/privateAd/RecordsTextFile/publication/recordsxmlfile): ").lower()
-        # choice = sys.argv[0]
+        choice = input("Enter the type of news record (News/privateAd/RecordsTextFile/publication/recordsxmlfile/dbrecords): ").lower()
         if choice == 'news':
             text = input("Enter the news text: ") or "default_text"  #getting input from user
             city = input("Enter the city: ") or "default_city"
@@ -130,6 +130,48 @@ def run():
             description = input("Enter the Publication description (default_description if empty):") or "default_description"
             expdate = input("Enter the Publication expiration date (YYYY-MM-DD) (2023-12-31 if empty):") or "2023-12-31"
             xmlProcessor.create_or_update_xml(file_name, folder_name, idd,title, author, expdate,price,description)
+        elif 'dbrecords' == choice:
+            choice = input("Enter the type of database record (csvrecords/userinput):")
+            if choice == 'csvrecords':
+                choice = input("Enter the type of databse record (news/privateadd/publication)':").lower()
+                if choice == 'news':
+                    with DatabaseConnection(choice) as conn:
+                        folder_name = input("Enter name of folder default_folder") or "default_folder.csv"
+                        file_name = input("Enter name of csv file in NewsPrviateAd.csv") or "NewsPrviateAd.csv"
+                        data_input_news_csv(conn, folder_name, file_name)
+                elif choice =='privateadd':
+                    with DatabaseConnection(choice) as conn:
+                        folder_name = input("Enter name of folder default_folder") or "default_folder.csv"
+                        file_name = input("Enter name of csv file in NewsPrviateAd.csv") or "NewsPrviateAd.csv"
+                        data_input_privateadd_csv(conn, folder_name, file_name)
+                elif choice =='publication':
+                    with DatabaseConnection(choice) as conn:
+                        folder_name = input("Enter name of folder default_folder") or "default_folder.csv"
+                        file_name = input("Enter name of csv file in NewsPrviateAd.csv") or "NewsPrviateAd.csv"
+                        data_input_news_csv(conn, folder_name, file_name)
+            elif choice == 'userinput':
+                choice = input("Enter the type of databse record (news/privateadd/publication)':").lower()
+                if choice == 'news':
+                    with DatabaseConnection(choice) as conn:
+                        id = input("Enter id (it should be integer) ") or "1"
+                        news_name = input("Enter news name (default_name)") or "default_name"
+                        news_title = input("Enter news title (default_title) ") or "default_title"
+                        news_text = input("Enter news text (default_text) ") or "default_text"
+                        data_input_news(conn,id,news_name,news_title,news_text)
+                elif choice == 'privateadd':
+                    with DatabaseConnection(choice) as conn:
+                        id = input("Enter id (it should be integer) ") or "1"
+                        privateadd_name = input("Enter news name (default_name)") or "default_name"
+                        privateadd_title = input("Enter news title (default_title) ") or "default_title"
+                        privateadd_text = input("Enter news text (default_text) ") or "default_text"
+                        data_input_privateadd(conn,id,privateadd_name,privateadd_title,privateadd_text)
+                elif choice == 'publication':
+                    with DatabaseConnection(choice) as conn:
+                        id = input("Enter id (it should be integer) ") or "1"
+                        publication_name = input("Enter publication name (default_name)") or "default_name"
+                        publication_title = input("Enter publication title (default_title) ") or "default_title"
+                        publication_text = input("Enter publication text (news_text) ") or "news_text"
+                        data_input_publication(conn,id,publication_name,publication_title,publication_text)
         else:
             print("Invalid choice. Please select a valid option.")
 
@@ -184,7 +226,6 @@ class xmlProcessor:
 
     #remove the file
         os.remove(file_name)
-
 
 def indent(elem, level=0):
         i = "\n" + level * "  "
@@ -277,6 +318,174 @@ class JSONProcessor:
 
         except Exception as e:
             print(f"Error loading records from '{file_name}': {str(e)}")
+
+class DatabaseConnection:
+    def __init__(self, database_file):
+        self.database_file = database_file
+        self.conn = None
+
+    def __enter__(self):
+        try:
+            self.conn = sqlite3.connect(self.database_file)
+            return self.conn
+        except sqlite3.Error as e:
+            print(f"Database connection error: {e}")
+            return None
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.conn:
+            self.conn.close()
+
+def data_input_news_csv(conn,folder_name,file_name):
+        try:
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+                print(f"Folder '{folder_name}' created.")
+            else:
+                print(f"Folder '{folder_name}' already exists.")
+                file_name = os.path.join(folder_name, file_name)
+
+        except Exception as e:
+            print(f"Error loading records from '{file_name}': {str(e)}")
+        cursor = conn.cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS  news_table (id INTEGER,news_name TEXT,news_title TEXT,news_text TEXT)')
+        with open(file_name, 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            next(csv_reader)  # Skip the header row if it exists
+            for row in csv_reader:
+                if len(row) >= 4:
+            # Assuming the CSV columns match the table columns
+                    cursor.execute('''INSERT INTO news_table (id, news_name,news_title,news_text) VALUES (?, ?,?,?)''', (row[0], row[1],row[2],row[3]))
+        cursor.execute('select * from news_table')
+        result = cursor.fetchall()
+        print(result)
+        check_duplicates_news(cursor)
+        conn.commit()
+
+def data_input_news(conn,id,news_name,news_title,news_text,file_name):
+        cursor = conn.cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS  news_table (id INTEGER,news_name TEXT,news_title TEXT,news_text TEXT)')
+        insert_query = "INSERT INTO news_table (id, news_name,news_title,news_text) VALUES (?, ?, ?, ?)"
+        cursor.execute(insert_query, (id, news_name,news_title,news_text))
+        cursor.execute('select * from news_table')
+        result = cursor.fetchall()
+        check_duplicates_news(cursor)
+        print(result)
+
+def check_duplicates_news(cursor):
+    query = 'SELECT id, news_name,news_title,news_text, COUNT(*) FROM news_table GROUP BY id, news_name,news_title,news_text' \
+            ' HAVING COUNT(*) > 1;'
+
+    cursor.execute(query)
+    duplicates = cursor.fetchall()
+
+    if duplicates:
+        print("Duplicate records found:")
+        for duplicate in duplicates:
+            print(duplicate)
+    else:
+        print("No duplicate records found.")
+
+def data_input_privateadd_csv(conn,folder_name,file_name):
+        try:
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+                print(f"Folder '{folder_name}' created.")
+            else:
+                print(f"Folder '{folder_name}' already exists.")
+                file_name = os.path.join(folder_name, file_name)
+
+        except Exception as e:
+            print(f"Error loading records from '{file_name}': {str(e)}")
+        cursor = conn.cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS  privateadd_table (id INTEGER,privateadd_name TEXT,privateadd_title TEXT,privateadd_text TEXT)')
+        with open(file_name, 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            next(csv_reader)  # Skip the header row if it exists
+            for row in csv_reader:
+                if len(row) >= 4:
+            # Assuming the CSV columns match the table columns
+                    cursor.execute('''INSERT INTO privateadd_table (id, privateadd_name,privateadd_title,privateadd_text) VALUES (?, ?,?,?)''', (row[0], row[1],row[2],row[3]))
+        cursor.execute('select * from privateadd_table')
+        result = cursor.fetchall()
+        print(result)
+        check_duplicates_padd(cursor)
+        conn.commit()
+
+def data_input_privateadd(conn,id,privateadd_name,privateadd_title,privateadd_text):
+        cursor = conn.cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS  privateadd_table (id INTEGER,privateadd_name TEXT,privateadd_title TEXT,privateadd_text TEXT)')
+        insert_query = "INSERT INTO privateadd_table (id, privateadd_name,privateadd_title,privateadd_text) VALUES (?, ?, ?, ?)"
+        cursor.execute(insert_query, (id, privateadd_name,privateadd_title,privateadd_text))
+        cursor.execute('select * from privateadd_table')
+        result = cursor.fetchall()
+        check_duplicates_padd(cursor)
+        print(result)
+
+def check_duplicates_padd(cursor):
+    query = 'SELECT id, privateadd_name,privateadd_title,privateadd_text, COUNT(*) FROM privateadd_table GROUP BY id, privateadd_name,privateadd_title,privateadd_text' \
+            ' HAVING COUNT(*) > 1;'
+
+    cursor.execute(query)
+    duplicates = cursor.fetchall()
+
+    if duplicates:
+        print("Duplicate records found:")
+        for duplicate in duplicates:
+            print(duplicate)
+    else:
+        print("No duplicate records found.")
+
+def data_input_publication_csv(conn,folder_name,file_name):
+        try:
+            if not os.path.exists(folder_name):
+                os.makedirs(folder_name)
+                print(f"Folder '{folder_name}' created.")
+            else:
+                print(f"Folder '{folder_name}' already exists.")
+                file_name = os.path.join(folder_name, file_name)
+
+        except Exception as e:
+            print(f"Error loading records from '{file_name}': {str(e)}")
+        cursor = conn.cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS  privateadd_table (id INTEGER,publication_name TEXT,publication_title TEXT,publication_text TEXT)')
+        with open(file_name, 'r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            next(csv_reader)  # Skip the header row if it exists
+            for row in csv_reader:
+                if len(row) >= 4:
+            # Assuming the CSV columns match the table columns
+                    cursor.execute('''INSERT INTO publication_table (id,publication_name,publication_title,publication_text) VALUES (?, ?,?,?)''', (row[0], row[1],row[2],row[3]))
+        cursor.execute('select * from publication_table')
+        result = cursor.fetchall()
+        print(result)
+        check_duplicates_pub(cursor)
+        conn.commit()
+
+def data_input_publication(conn,id,publication_name,publication_title,publication_text):
+        cursor = conn.cursor()
+        cursor.execute('CREATE TABLE IF NOT EXISTS  publication_table (id INTEGER,publication_name TEXT,publication_title TEXT,publication_text TEXT)')
+        insert_query = "INSERT INTO publication_table (id,publication_name,publication_title,publication_text) VALUES (?, ?, ?, ?)"
+        cursor.execute(insert_query, (id, publication_name,publication_title,publication_text))
+        cursor.execute('select * from publication_table')
+        result = cursor.fetchall()
+        check_duplicates_pub(cursor)
+        print(result)
+
+def check_duplicates_pub(cursor):
+    query = 'SELECT id,publication_name,publication_title,publication_text, COUNT(*) FROM publication_table GROUP BY ' \
+            'id,publication_name,publication_title,publication_text' \
+            ' HAVING COUNT(*) > 1;'
+
+    cursor.execute(query)
+    duplicates = cursor.fetchall()
+
+    if duplicates:
+        print("Duplicate records found:")
+        for duplicate in duplicates:
+            print(duplicate)
+    else:
+        print("No duplicate records found.")
 
 if __name__ == "__main__":
     run()

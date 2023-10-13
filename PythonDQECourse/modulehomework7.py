@@ -25,7 +25,7 @@ class NewsGenerator:
         self.feed_data.append({"type": "News", "text": text, "city": city, "timestamp": timestamp})
         self.publish_feed()
 
-    def adding_private_ad(self, text, expiration_date_str):        #this is private add function where we can add add
+    def adding_private_ad(self, text = 'default_text', expiration_date_str = '2023-12-31'):        #this is private add function where we can add add
         try:
             expiration_date = datetime.strptime(expiration_date_str, "%Y-%m-%d")
             days_left = (expiration_date - datetime.now()).days
